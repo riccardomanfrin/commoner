@@ -15,13 +15,13 @@ defmodule Mix.Tasks.CommonTest do
           {module, _} <- Code.require_file(file),
           do: module
 
-    IO.inspect(
+
       :ct.run_testspec([
         {:suites, to_charlist(path), modules},
         logdir: './results',
         abort_if_missing_suites: true,
         ct_hooks: [Commoner.Hooks.Shell]
       ])
-    )
+
   end
 end
