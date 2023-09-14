@@ -12,6 +12,9 @@ defmodule CommonTest.Opts do
       case Keyword.get_values(opts, optkey) do
         [] -> default(optkey)
         res ->
+          res = for r <- res do
+            String.split(r, ",")
+          end |> List.flatten()
           case optkey in keep_opts do
             true -> [{optkey, res}]
             false -> [{optkey, List.last(res)}]
@@ -36,10 +39,10 @@ defmodule CommonTest.Opts do
   defp keep_opts(keepopts, [{opt, [_, :keep]} | rest]), do: keep_opts([opt | keepopts], rest)
   defp keep_opts(keepopts, [_ | rest]), do: keep_opts(keepopts, rest)
 
-  defp map_to_ct_opt({:hook, val}, keep_opts), do: {:ct_hooks, Enum.map(val, &str_to_elixir_atom/1)}
+  defp map_to_ct_opt({:hook, val}, keep_opts), do: {:ct_hooks, Enum.map(val, &to_ex_module/1)}
   defp map_to_ct_opt({optkey, val}, keep_opts), do: {map_opt_key(optkey, keep_opts), map_opt_val(val)}
 
-  defp str_to_elixir_atom(str), do: String.to_existing_atom("Elixir." <> str)
+  defp to_ex_module(str), do: String.to_atom("Elixir." <> str)
 
   defp map_opt_val(val) when is_binary(val), do: String.to_charlist(val)
   defp map_opt_val(val) when is_list(val), do: Enum.map(val, &String.to_charlist/1)
