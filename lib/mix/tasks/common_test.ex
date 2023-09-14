@@ -6,7 +6,7 @@ defmodule Mix.Tasks.CommonTest do
 
     Mix.Task.run(:loadpaths)
 
-    ct_opts = CommonTest.Opts.parse(args) |> IO.inspect()
+    ct_opts = CommonTest.Opts.parse(args)
 
     paths = Keyword.get(ct_opts, :dirs)
     suites = Keyword.get(ct_opts, :suites, ["*_suite"])
@@ -18,14 +18,12 @@ defmodule Mix.Tasks.CommonTest do
 
     :ct.run_testspec([
       {:suites, paths, modules} | ct_opts
-    ]|> IO.inspect())
+    ])
 
   end
 
   defp lookup_modules_from_suites(paths, suites) do
-    modules = for path <- paths do
-      IO.inspect(path, label: PATH)
-
+    for path <- paths do
       for suite <- suites do
         match = Path.join([path, "**", "#{suite}.exs"])
         for file <- Path.wildcard(match),
@@ -33,6 +31,5 @@ defmodule Mix.Tasks.CommonTest do
             do: module
       end
     end |> List.flatten()
-    |> IO.inspect
   end
 end
