@@ -13,7 +13,7 @@ defmodule Commoner.Hooks.Shell do
     {return, state}
   end
 
-  def on_tc_fail(suite, name, {%ExUnit.AssertionError{} = error, _}, state) do
+  def on_tc_fail(_suite, _name, {%ExUnit.AssertionError{} = error, _}, state) do
     write(Exception.message(error))
 
     :ct.log(:error, 100, Exception.message(error))
