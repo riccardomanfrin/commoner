@@ -5,6 +5,7 @@ defmodule CommonTest.Suite do
       import CommonTest.Assertions
 
       Module.register_attribute(__MODULE__, :common_test_tests, accumulate: true)
+      Module.register_attribute(__MODULE__, :testdoc, accumulate: false)
 
       @before_compile unquote(__MODULE__)
     end
@@ -33,6 +34,12 @@ defmodule CommonTest.Suite do
       name = :"#{message}"
       @common_test_tests name
       def unquote(name)(unquote(var)), do: unquote(contents)
+      if @testdoc == nil do
+        raise("Please document your test [#{message}] with @doctest attribute")
+      else
+        def help(unquote(name)), do: @testdoc
+      end
+      @testdoc nil
     end
   end
 
