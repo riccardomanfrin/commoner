@@ -39,7 +39,8 @@ defmodule CommonTest.Opts do
   defp keep_opts(keepopts, [{opt, [_, :keep]} | rest]), do: keep_opts([opt | keepopts], rest)
   defp keep_opts(keepopts, [_ | rest]), do: keep_opts(keepopts, rest)
 
-  defp map_to_ct_opt({:hook, val}, keep_opts), do: {:ct_hooks, Enum.map(val, &to_ex_module/1)}
+  defp map_to_ct_opt({:userconfig, val}, _keep_opts), do: {:userconfig, map_opt_userconfig_val(val)}
+  defp map_to_ct_opt({:hook, val}, _keep_opts), do: {:ct_hooks, Enum.map(val, &to_ex_module/1)}
   defp map_to_ct_opt({optkey, val}, keep_opts), do: {map_opt_key(optkey, keep_opts), map_opt_val(val)}
 
   defp to_ex_module(str), do: String.to_atom("Elixir." <> str)
@@ -48,10 +49,18 @@ defmodule CommonTest.Opts do
   defp map_opt_val(val) when is_list(val), do: Enum.map(val, &String.to_charlist/1)
   defp map_opt_val(val), do: val
 
+  defp map_opt_key(:config, _keep_opts), do: :config
   defp map_opt_key(optkey, keep_opts) do
     case optkey in keep_opts do
       true -> String.to_atom(Atom.to_string(optkey) <> "s")
       false -> optkey
+    end
+  end
+
+  def map_opt_userconfig_val(val) do
+    userconfigs = for s <- String.split(val, "and"), do: String.split(s) |> List.flatten()
+    for [cbk, cfg] <- userconfigs do
+      {String.to_atom(cbk), String.to_charlist(cfg)}
     end
   end
 
@@ -71,6 +80,7 @@ defmodule CommonTest.Opts do
       {:testcase, [:string, :keep]}, # comma-separated list
       {:label, :string}, # String
       {:config, [:string, :keep]}, # comma-separated list
+      {:userconfig, :string}, # comma-separated list
       {:spec, [:string, :keep]}, # comma-separated list
       {:join_specs, :boolean},
       {:allow_user_terms, :boolean}, # Bool
@@ -112,6 +122,7 @@ defmodule CommonTest.Opts do
   defp help(:testcase), do: "List of test cases to run"
   #defp help(:label), do: "Test label"
   defp help(:config), do: "List of config files"
+  defp help(:userconfig), do: "List of user config callbacks and files"
   defp help(:spec), do: "List of test specifications"
   #defp help(:join_specs), do: "Merge all test specifications and perform a single test run"
   #defp help(:sys_config), do: "List of application config files"
