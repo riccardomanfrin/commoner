@@ -14,7 +14,7 @@ defmodule CommonTest.Assertions do
     :ok
   end
 
-  defmacro assert({:=, _, [a, b]} = match) do
+  defmacro assert({:=, _, [a, b]}) do
     quote do
       case unquote(b) do
         unquote(a) = val ->
