@@ -35,7 +35,7 @@ defmodule CommonTest.Suite do
       @common_test_tests name
       def unquote(name)(unquote(var)), do: unquote(contents)
       if @testdoc == nil do
-        raise("Please document your test [#{message}] with @doctest attribute")
+        raise("Please document your test [#{message}] with @testdoc attribute")
       else
         def help(unquote(name)), do: @testdoc
       end
